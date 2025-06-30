@@ -1,0 +1,9 @@
+function eggsBenedict {
+    print("eggs benedict");
+}
+
+l = 256;
+while l > 0 {
+    eggsBenedict();
+    l = l - 1;
+}

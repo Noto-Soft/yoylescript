@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 astnode_t* eval(yoylestate_t* state, astnode_t* node) {
     if (node == NULL) {
@@ -115,26 +116,34 @@ astnode_t* eval(yoylestate_t* state, astnode_t* node) {
     return NULL;
 }
 
-void print_astnode(astnode_t* node) {
+#define PRINTLF(printlf) if (printlf) printf("\n");
+
+void print_astnode(astnode_t* node, bool printlf) {
     if (!node) {
-        printf("(nil)\n");
+        printf("(nil)");
+        PRINTLF(printlf);
         return;
     }
 
     switch (node->type) {
         case NODE_INT_LITERAL:
-            printf("%d\n", node->intValue);
+            printf("%d", node->intValue);
+            PRINTLF(printlf);
             break;
 
         case NODE_STRING_LITERAL:
-            if (node->stringValue)
-                printf("%s\n", node->stringValue);
-            else
-                printf("(nil string)\n");
+            if (node->stringValue) {
+                printf("%s", node->stringValue);
+                PRINTLF(printlf);
+            } else {
+                printf("(nil string)");
+                PRINTLF(printlf);
+            }
             break;
 
         default:
-            printf("(unsupported node type for print)\n");
+            printf("(unsupported node type for print)");
+            PRINTLF(printlf);
             break;
     }
 }
@@ -147,10 +156,17 @@ void _free_ast(astnode_t* node) {
             free_ast(node->binaryExpr.right);
             break;
         case NODE_ASSIGNMENT:
+        case NODE_FUNCTION_DEF:
+            free(node->assignment.varName);
             free_ast(node->assignment.value);
+            break;
+        case NODE_FUNCTION_CALL:
+            free(node->funcCall.funcName);
             break;
         case NODE_STRING_LITERAL:
         case NODE_VARNAME_LITERAL:
+        case NODE_POP_ARG:
+            free(node->stringValue);
             break;
         case NODE_STATEMENT:
             free_ast(node->statement.statement);

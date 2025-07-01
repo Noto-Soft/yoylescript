@@ -3,6 +3,8 @@
 #include "yoyleast.h"
 #include "yoylestate.h"
 
+#include <stdbool.h>
+
 #define free_ast(node) do { _free_ast(node); node = NULL; } while(0)
 #define free_symbol_table(table) do { _free_symbol_table(table); table = NULL; } while(0)
 #define free_stack(stack) do { _free_stack(stack); stack = NULL; } while(0)
@@ -19,7 +21,7 @@ typedef struct yoylestack_t {
 } yoylestack_t;
 
 astnode_t* eval(yoylestate_t* state, astnode_t* node);
-void print_astnode(astnode_t* node);
+void print_astnode(astnode_t* node, bool printlf);
 void _free_ast(astnode_t* rootNode);
 
 astnode_t* symbol_table_lookup(varentry_t** symbol_table, const char* name);

@@ -1,8 +1,2 @@
-function eggsBenedict(test) {
-    print(test);
-    print("eggs benedict");
-}
-
-// the comment of all time
-
-eggsBenedict();
+input();
+print(result);

@@ -29,4 +29,3 @@ void _free_symbol_table(varentry_t* entry);
 void push_stack(yoylestack_t** stack, astnode_t* value);
 astnode_t* pop_stack(yoylestack_t** stack);
 void _free_stack(yoylestack_t* stack);
-yoylestack_t* create_empty_stack();

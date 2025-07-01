@@ -8,6 +8,11 @@ typedef struct {
     token_t current;
 } parser_t;
 
+typedef struct char_linked_list {
+    char* value;
+    struct char_linked_list* next;
+} char_linked_list;
+
 void parser_init(parser_t* parser, lexer_t* lexer);
 astnode_t* parse_statement(parser_t* parser);
 astnode_t* parse_program(parser_t* parser);

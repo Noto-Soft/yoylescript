@@ -1,9 +1,8 @@
-function eggsBenedict {
+function eggsBenedict(test) {
+    print(test);
     print("eggs benedict");
 }
 
-l = 256;
-while l > 0 {
-    eggsBenedict();
-    l = l - 1;
-}
+// the comment of all time
+
+eggsBenedict();

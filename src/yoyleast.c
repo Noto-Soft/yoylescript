@@ -36,6 +36,12 @@ astnode_t* new_literal_varname(char* value) {
     return node;
 }
 
+astnode_t* new_nil_value() {
+    astnode_t* node = create_node();
+    node->type = NODE_NIL;
+    return node;
+}
+
 astnode_t* new_unary_expr(astnode_t* left, char op) {
     astnode_t* node = create_node();
     node->type = NODE_UNARY_EXPR;

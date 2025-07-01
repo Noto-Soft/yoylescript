@@ -20,9 +20,21 @@ static char advance(lexer_t* lexer) {
 }
 
 static void skip_whitespace(lexer_t* lexer) {
-    while (isspace(peek(lexer))) {
-        if (peek(lexer) == '\n') lexer->line++;
-        advance(lexer);
+    while (1) {
+        char c = peek(lexer);
+
+        if (isspace(c)) {
+            if (c == '\n') lexer->line++;
+            advance(lexer);
+        }
+        else if (c == '/' && lexer->src[lexer->pos + 1] == '/') {
+            while (peek(lexer) && peek(lexer) != '\n') {
+                advance(lexer);
+            }
+        }
+        else {
+            break;
+        }
     }
 }
 
@@ -62,6 +74,8 @@ token_t lexer_next(lexer_t* lexer) {
             tok.type = TOKEN_ELSE;
         } else if (strcmp(tok.lexeme, "while") == 0) { 
             tok.type = TOKEN_WHILE;
+        } else if (strcmp(tok.lexeme, "nil") == 0) { 
+            tok.type = TOKEN_NIL;
         } else {
             tok.type = TOKEN_IDENTIFIER;
         }

@@ -19,6 +19,7 @@ typedef enum {
     TOKEN_COMMA,
     TOKEN_UNARY_OPERATOR,
     TOKEN_BINARY_OPERATOR,
+    TOKEN_NIL,
 } TokenType;
 
 typedef struct {

@@ -23,9 +23,10 @@ astnode_t* eval(yoylestate_t* state, astnode_t* node) {
             }
             return NULL;
         }
-        case NODE_INT_LITERAL: return node;
+        case NODE_INT_LITERAL:
         case NODE_STRING_LITERAL: return node;
         case NODE_VARNAME_LITERAL: return symbol_table_lookup(&state->symbol_table, node->stringValue);
+        case NODE_NIL: return NULL;
         case NODE_UNARY_EXPR: {
             astnode_t* left = eval(state, node->unaryExpr.operand);
             if (left->type == NODE_INT_LITERAL) {
@@ -116,7 +117,7 @@ astnode_t* eval(yoylestate_t* state, astnode_t* node) {
 
 void print_astnode(astnode_t* node) {
     if (!node) {
-        printf("(null)\n");
+        printf("(nil)\n");
         return;
     }
 
@@ -129,7 +130,7 @@ void print_astnode(astnode_t* node) {
             if (node->stringValue)
                 printf("%s\n", node->stringValue);
             else
-                printf("(null string)\n");
+                printf("(nil string)\n");
             break;
 
         default:
@@ -254,11 +255,4 @@ void _free_stack(yoylestack_t* stack) {
         free(stack);
         stack = next;
     }
-}
-
-yoylestack_t* create_empty_stack() {
-    yoylestack_t* stack = (yoylestack_t*)malloc(sizeof(yoylestack_t*));
-    stack->value = new_literal_int(0);
-    stack->next = NULL;
-    return stack;
 }

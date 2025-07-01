@@ -44,6 +44,11 @@ astnode_t* parse_primary(parser_t* parser) {
             parser_advance(parser);
             return node;
         }
+        case TOKEN_NIL: {
+            astnode_t* node = new_nil_value();
+            parser_advance(parser);
+            return node;
+        }
         case TOKEN_LPAREN: {
             parser_advance(parser); 
             astnode_t* expr = parse_expression(parser);
@@ -54,7 +59,7 @@ astnode_t* parse_primary(parser_t* parser) {
             return expr;
         }
         default:
-            fatalf("Unexpected token in primary expression: %s", tok.lexeme ? tok.lexeme : "(null)");
+            fatalf("Unexpected token in primary expression: %s", tok.lexeme ? tok.lexeme : "(nil)");
             return NULL;
     }
 }
@@ -159,6 +164,42 @@ astnode_t* parse_statement(parser_t* parser) {
             char* funcName = strdup(parser->current.lexeme);
             parser_advance(parser);
 
+            if (parser->current.type != TOKEN_LPAREN) {
+                fatal("Expected '(' after function name");
+            }
+            parser_advance(parser);
+
+            
+            astnode_t* paramPops = NULL;
+            astnode_t* lastPop = NULL;
+
+            while (parser->current.type != TOKEN_RPAREN) {
+                if (parser->current.type != TOKEN_IDENTIFIER) {
+                    fatal("Expected parameter name (identifier)");
+                }
+
+                char* paramName = strdup(parser->current.lexeme);
+                astnode_t* popArgStmt = new_statement(new_pop_arg(paramName), NULL);
+
+                if (!paramPops) {
+                    paramPops = popArgStmt;
+                    lastPop = popArgStmt;
+                } else {
+                    lastPop->statement.nextStatement = popArgStmt;
+                    lastPop = popArgStmt;
+                }
+
+                parser_advance(parser);
+
+                if (parser->current.type == TOKEN_COMMA) {
+                    parser_advance(parser);
+                } else if (parser->current.type != TOKEN_RPAREN) {
+                    fatal("Expected ',' or ')' in parameter list");
+                }
+            }
+
+            parser_advance(parser); 
+
             if (parser->current.type != TOKEN_LBRACE) {
                 fatal("Function declaration is lacking an opening brace");
             }
@@ -168,6 +209,7 @@ astnode_t* parse_statement(parser_t* parser) {
             astnode_t* funcBody = NULL;
             astnode_t* lastStatement = NULL;
 
+            
             while (parser->current.type != TOKEN_RBRACE && parser->current.type != TOKEN_EOF) {
                 astnode_t* stmt = parse_statement(parser);
                 if (!stmt) fatal("Failed to parse statement inside function body");
@@ -190,6 +232,11 @@ astnode_t* parse_statement(parser_t* parser) {
             parser_advance(parser); 
 
             
+            if (lastPop) {
+                lastPop->statement.nextStatement = funcBody;
+                funcBody = paramPops;
+            }
+
             return new_function_def(funcName, funcBody);
         }
         case TOKEN_IF: {

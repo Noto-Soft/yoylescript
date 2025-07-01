@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 
     char* file = read_file(argv[1]);
 
-    yoylestate_t state = {NULL, create_empty_stack()};
+    yoylestate_t state = {NULL, NULL};
 
     symbol_table_set(&state.symbol_table, "print", new_cfunc(print_c));
 

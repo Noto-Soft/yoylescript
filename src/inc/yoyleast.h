@@ -16,6 +16,7 @@ typedef enum {
     NODE_STATEMENT,
     NODE_FUNCTION_DEF,
     NODE_POP_ARG,
+    NODE_NIL,
 } NodeType;
 
 typedef struct astnode_t {
@@ -63,6 +64,7 @@ typedef struct astnode_t {
 astnode_t* new_literal_int(int value);
 astnode_t* new_literal_string(char* value);
 astnode_t* new_literal_varname(char* value);
+astnode_t* new_nil_value();
 astnode_t* new_unary_expr(astnode_t* left, char op);
 astnode_t* new_binary_expr(astnode_t* left, astnode_t* right, char op);
 astnode_t* new_assignment(char* name, astnode_t* value);

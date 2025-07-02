@@ -6,6 +6,16 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+char *strndup(const char *s, size_t n) {
+    char *result = malloc(n + 1);
+    if (!result) return NULL;
+    memcpy(result, s, n);
+    result[n] = '\0';
+    return result;
+}
+
+
+
 void lexer_init(lexer_t* lexer, const char* src) {
     lexer->src = src;
     lexer->pos = 0;

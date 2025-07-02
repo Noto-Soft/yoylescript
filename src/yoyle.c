@@ -23,16 +23,36 @@ void print_c(yoylestate_t* state) {
 }
 
 char* read_input() {
-    char *input = NULL;
-    size_t size = 0;
-    ssize_t len = getline(&input, &size, stdin);
-    if (len == -1) {
+    size_t capacity = 128;
+    size_t length = 0;
+    char *input = malloc(capacity);
+    if (!input) return NULL;
+
+    int c;
+    while ((c = fgetc(stdin)) != EOF) {
+        if (length + 1 >= capacity) {
+            capacity *= 2;
+            char *new_input = realloc(input, capacity);
+            if (!new_input) {
+                free(input);
+                return NULL;
+            }
+            input = new_input;
+        }
+
+        if (c == '\n') {
+            break;
+        }
+
+        input[length++] = (char)c;
+    }
+
+    if (length == 0 && c == EOF) {
         free(input);
         return NULL;
     }
-    if (len > 0 && input[len - 1] == '\n') {
-        input[len - 1] = '\0';
-    }
+
+    input[length] = '\0';
     return input;
 }
 

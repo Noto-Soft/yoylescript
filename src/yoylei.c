@@ -9,18 +9,18 @@
 
 astnode_t* eval(yoylestate_t* state, astnode_t* node) {
     if (node == NULL) {
-        fatal("Null nodes passed to eval statement");
+        return NULL;
     }
 
     switch (node->type) {
         case NODE_STATEMENT: {
             astnode_t* current = node;
             while (current != NULL && current->type == NODE_STATEMENT) {
-                eval(state, current->statement.statement);
+                astnode_t* result = eval(state, current->statement.statement);
+                if (result == (astnode_t*)-1) {
+                    return result;
+                }
                 current = current->statement.nextStatement;
-            }
-            if (current != NULL) {
-                return eval(state, current);
             }
             return NULL;
         }
@@ -93,8 +93,11 @@ astnode_t* eval(yoylestate_t* state, astnode_t* node) {
                 case NODE_CFUNC: func->cFunction(state); break;
                 default: fatalf("Cannot run a non-function (%s)", node->funcCall.funcName);
             }
-            return NULL;
+            return pop_stack(&state->arg_stack);
         }
+        case NODE_RETURN:
+            push_stack(&state->arg_stack, node->nodeValue);
+            return (astnode_t*)-1;
         case NODE_IF_STATEMENT:
             if (eval(state, node->ifStmt.condition)->intValue != 0) {
                 eval(state, node->ifStmt.thenbranch);
@@ -171,6 +174,16 @@ void _free_ast(astnode_t* node) {
         case NODE_STATEMENT:
             free_ast(node->statement.statement);
             free_ast(node->statement.nextStatement);
+            break;
+        case NODE_IF_STATEMENT:
+            free_ast(node->ifStmt.thenbranch);
+            if (node->ifStmt.elsebranch != NULL) free_ast(node->ifStmt.elsebranch);
+            break;
+        case NODE_WHILE_LOOP:
+            free_ast(node->whileLoop.dobranch);
+            break;
+        case NODE_RETURN:
+            free_ast(node->nodeValue);
             break;
         default:
             break;

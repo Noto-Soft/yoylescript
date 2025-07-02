@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <ctype.h>
 
 void lexer_init(lexer_t* lexer, const char* src) {
@@ -66,17 +67,15 @@ token_t lexer_next(lexer_t* lexer) {
         size_t len = lexer->pos - start;
         tok.lexeme = strndup(lexer->src + start, len);
 
-        if (strcmp(tok.lexeme, "function") == 0) {
-            tok.type = TOKEN_FUNC;
-        } else if (strcmp(tok.lexeme, "if") == 0) { 
-            tok.type = TOKEN_IF;
-        } else if (strcmp(tok.lexeme, "else") == 0) { 
-            tok.type = TOKEN_ELSE;
-        } else if (strcmp(tok.lexeme, "while") == 0) { 
-            tok.type = TOKEN_WHILE;
-        } else if (strcmp(tok.lexeme, "nil") == 0) { 
-            tok.type = TOKEN_NIL;
-        } else {
+        bool found = false;
+        for (size_t i = 0; i < KEYWORD_COUNT; ++i) {
+            if (strcmp(tok.lexeme, keywordmap[i].keyword) == 0) {
+                tok.type = keywordmap[i].type;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             tok.type = TOKEN_IDENTIFIER;
         }
 
@@ -129,9 +128,4 @@ token_t lexer_expect(lexer_t* lexer, TokenType expected) {
         tok.type = TOKEN_ERROR;
     }
     return tok;
-}
-
-void free_token(token_t tok) {
-    if (tok.lexeme) free(tok.lexeme);
-    if (tok.type == TOKEN_STRING && tok.strValue) free(tok.strValue);
 }

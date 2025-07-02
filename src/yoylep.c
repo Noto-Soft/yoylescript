@@ -34,15 +34,61 @@ astnode_t* parse_primary(parser_t* parser) {
             parser_advance(parser);
             return node;
         }
+        case TOKEN_TRUE: {
+            astnode_t* node = new_literal_int(1);
+            parser_advance(parser);
+            return node;
+        }
+        case TOKEN_FALSE: {
+            astnode_t* node = new_literal_int(0);
+            parser_advance(parser);
+            return node;
+        }
         case TOKEN_STRING: {
             astnode_t* node = new_literal_string(strdup(tok.strValue));
             parser_advance(parser);
             return node;
         }
         case TOKEN_IDENTIFIER: {
-            astnode_t* node = new_literal_varname(strdup(tok.lexeme));
+            char* name = strdup(tok.lexeme);
             parser_advance(parser);
-            return node;
+
+            if (parser->current.type == TOKEN_LPAREN) {
+                parser_advance(parser);
+
+                astnode_t** argv = NULL;
+                int argc = 0;
+
+                if (parser->current.type != TOKEN_RPAREN) {
+                    while (1) {
+                        astnode_t* arg = parse_expression(parser);
+                        if (!arg) {
+                            fatal("Failed to parse function call argument");
+                        }
+
+                        argc++;
+                        argv = realloc(argv, sizeof(astnode_t*) * argc);
+                        argv[argc - 1] = arg;
+
+                        if (parser->current.type == TOKEN_COMMA) {
+                            parser_advance(parser);
+                        } else if (parser->current.type == TOKEN_RPAREN) {
+                            break;
+                        } else {
+                            fatal("Expected ',' or ')' after function call argument");
+                        }
+                    }
+                }
+
+                if (parser->current.type != TOKEN_RPAREN) {
+                    fatal("Expected ')' at end of function call");
+                }
+
+                parser_advance(parser);
+                return new_function_call(name, argc, argv);
+            }
+
+            return new_literal_varname(name);
         }
         case TOKEN_NIL: {
             astnode_t* node = new_nil_value();
@@ -357,6 +403,23 @@ astnode_t* parse_statement(parser_t* parser) {
             parser_advance(parser); 
 
             return new_while_loop(condition, doBody);
+        }
+        case TOKEN_RETURN: {
+            parser_advance(parser);
+
+            astnode_t* returnValue = NULL;
+
+            if (parser->current.type != TOKEN_SEMICOLON) {
+                returnValue = parse_expression(parser);
+            }
+
+            if (parser->current.type != TOKEN_SEMICOLON) {
+                fatal("Expected semicolon after return statement");
+            }
+
+            parser_advance(parser);
+
+            return new_return(returnValue);
         }
     }
 

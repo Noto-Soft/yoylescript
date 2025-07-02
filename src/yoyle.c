@@ -37,10 +37,19 @@ char* read_input() {
 }
 
 void input_c(yoylestate_t* state) {
+    astnode_t* message = pop_stack(&state->arg_stack);
+    if (message != NULL && message->type != NODE_NIL) {
+        astnode_t* newline = pop_stack(&state->arg_stack);
+        bool printlf = true;
+        if (newline != NULL && newline->type != NODE_NIL) {
+            printlf = eval(state, newline)->intValue != 0;
+        }
+        print_astnode(eval(state, message), printlf);
+    }
     char* in = read_input();
     astnode_t* input = new_literal_string(in);
     free(in);
-    symbol_table_set(&state->symbol_table, "result", input);
+    push_stack(&state->arg_stack, input);
 }
 
 int main(int argc, char** argv) {

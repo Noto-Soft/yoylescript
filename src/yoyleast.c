@@ -120,6 +120,13 @@ astnode_t* new_function_def(char* value, astnode_t* firstStatement) {
     return node;
 }
 
+astnode_t* new_return(astnode_t* value) {
+    astnode_t* node = create_node();
+    node->type = NODE_RETURN;
+    node->nodeValue = value;
+    return node;
+}
+
 astnode_t* new_pop_arg(char* variable) {
     astnode_t* node = create_node();
     node->type = NODE_POP_ARG;

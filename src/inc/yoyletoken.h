@@ -20,7 +20,20 @@ typedef enum {
     TOKEN_UNARY_OPERATOR,
     TOKEN_BINARY_OPERATOR,
     TOKEN_NIL,
+    TOKEN_RETURN,
+    TOKEN_TRUE,
+    TOKEN_FALSE,
 } TokenType;
+
+typedef struct {
+    const char* keyword;
+    TokenType type;
+} keywordmap_t;
+
+extern keywordmap_t keywordmap[];
+extern const int keywordmap_count;
+
+#define KEYWORD_COUNT keywordmap_count
 
 typedef struct {
     TokenType type;

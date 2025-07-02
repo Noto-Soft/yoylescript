@@ -17,6 +17,7 @@ typedef enum {
     NODE_FUNCTION_DEF,
     NODE_POP_ARG,
     NODE_NIL,
+    NODE_RETURN,
 } NodeType;
 
 typedef struct astnode_t {
@@ -74,6 +75,7 @@ astnode_t* new_cfunc(void (*cfunc)(yoylestate_t*));
 astnode_t* new_function_def(char* value, astnode_t* firstStatement);
 astnode_t* new_if_statement(astnode_t* condition, astnode_t* thenbranch, astnode_t* elsev);
 astnode_t* new_while_loop(astnode_t* condition, astnode_t* dobranch);
+astnode_t* new_return(astnode_t* value);
 astnode_t* new_pop_arg(char* variable);
 void astnode_retain(astnode_t* node);
 void astnode_release(astnode_t* node);

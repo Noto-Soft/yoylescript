@@ -23,7 +23,7 @@ char* read_file(const char* filename) {
 
     rewind(file);
 
-    char *buffer = malloc(filesize);
+    char *buffer = malloc(filesize + 1);
     if (!buffer) {
         fclose(file);
         fatal("Memory allocation failed");
@@ -35,6 +35,8 @@ char* read_file(const char* filename) {
         fclose(file);
         fatal("Failed to read entire file");
     }
+
+    buffer[filesize] = '\0';
 
     fclose(file);
 
